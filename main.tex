@@ -66,6 +66,12 @@ NeuroFrame's central hypothesis is that the spatial structure of extracellular a
 
 Preliminary work establishes feasibility. On held-out IBL animals, geometry-aware LFP models have reduced three-dimensional localization error from approximately 1.6 mm to 1.2 mm after rigid probe-geometry refinement. Increasing self-supervised data from 25k to 1M samples improves frozen-decoder performance, while prior experiments have used essentially the same wav2vec2-base backbone (approximately 95M parameters). The key unanswered question is whether the apparent scaling plateau reflects insufficient model capacity and incomplete pretraining rather than a limit of the signal. A second unresolved question is whether native 30-kHz action-potential modeling can recover information discarded by the current single-channel, downsampled AP transfer pipeline.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth,height=1.55in,keepaspectratio]{figures/scaling_chanDistc_transformer_1M_geometry.png}
+\caption{Preliminary scaling and geometry check. Left: rebuttal-reported MaskPred versus MaskPred+ChanDistc RMSE across 25k--1M scales, with the 75k transformer-decoder head check inset. Right: verified 1M predictions and rigid Kabsch-fitted probe lines inside the Allen CCF brain mask. Kabsch uses predicted geometry; ground truth is used only for scoring.}
+\end{figure}
+
 \subheading{2. Goals and aims}
 \textbf{Aim 1 -- Converged capacity and data scaling.} Train geometry-aware LFP encoders at approximately 95M, 317M, and 1B parameters across validated corpus sizes from the existing 1M scale toward 10M and 32M chunks. Complete intended training schedules instead of relying on early snapshots forced by local wall-time limits. Evaluate every headline cell with frozen linear, nonlinear, and sequence readouts on held-out animals and probes.
 
