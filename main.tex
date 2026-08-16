@@ -53,6 +53,10 @@ Google Cloud is essential because the longest multi-GPU jobs exceed NYU Torch's 
 % ---------------------------------------------------------------------------
 % Research Project (two pages)
 % ---------------------------------------------------------------------------
+\begingroup
+\small
+\setlength{\parskip}{2pt}
+\setlength{\tabcolsep}{3pt}
 \heading{Research Project}
 \subheading{1. Importance and motivation}
 
@@ -129,6 +133,7 @@ The minimum outcome is a rigorously measured, converged capacity/data scaling cu
 
 \textbf{GCP usage within the research plan.} Cloud Batch will orchestrate reproducible jobs; Compute Engine A3 High/Flex-start will run long LFP training; A3 Ultra/H200 will support native AP memory and staging requirements; spot A4/B200 and A100 resources will support checkpointable replications and downstream evaluation; Cloud Storage will hold public shards, checkpoints, and archived artifacts. Only public data and derived research artifacts are in scope. Results and released checkpoints will be exported to NYU before the credit expires.
 
+\endgroup
 \newpage
 
 % ---------------------------------------------------------------------------
