@@ -8,6 +8,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
+\usepackage{float}
 \usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
@@ -133,7 +134,7 @@ The minimum outcome is a rigorously measured, converged capacity/data scaling cu
 
 \textbf{GCP usage within the research plan.} Cloud Batch will orchestrate reproducible jobs; Compute Engine A3 High/Flex-start will run long LFP training; A3 Ultra/H200 will support native AP memory and staging requirements; spot A4/B200 and A100 resources will support checkpointable replications and downstream evaluation; Cloud Storage will hold public shards, checkpoints, and archived artifacts. Only public data and derived research artifacts are in scope. Results and released checkpoints will be exported to NYU before the credit expires.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth,height=2.05in,keepaspectratio]{figures/scaling_chanDistc_transformer_1M_geometry.png}
 \caption{\label{fig:prelim}Preliminary evidence motivating the requested scaling. Left: three-dimensional localization error on held-out IBL animals versus self-supervised pretraining scale (25k--1M samples) for the geometry-aware MaskPred+ChanDistc encoder with a probe-sequence decoder; dashed is raw unaligned error, solid applies the rigid probe-geometry fit (mean $\pm$ SD over 8 seeds, unweighted fit at every rung). Error falls monotonically across all four rungs, from 1{,}474 to 1{,}290\,$\mu$m raw and 1{,}415 to 1{,}200\,$\mu$m after refinement, with no sign of saturation at the largest corpus we can currently train --- the observation this proposal seeks to extend to larger capacity and corpus sizes. Right: the 1M model from that curve, showing the true trajectory (gray) and the Kabsch-fitted predicted trajectory (teal) of each of 119 held-out probes inside the Allen CCF brain mask (left-hemisphere-folded, 39{,}615 test channels; median per-probe path error 898\,$\mu$m). The Kabsch fit maps known on-probe channel geometry onto predicted coordinates; ground truth is used only for scoring.}
