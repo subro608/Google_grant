@@ -43,11 +43,11 @@
 \textbf{PI: Erdem Varol, New York University}
 \end{center}
 
-Large-scale electrophysiology is difficult to compare across animals, laboratories, and probe designs because recordings are usually referenced by targeting procedures rather than validated biological coordinates. The same nominal brain region can contain different tissue, cells, and molecular environments. This hidden sampling variation reduces reproducibility and can make an apparent task effect look biological or behavioral.
+Most invasive neural recordings are referenced by informal targeting procedures rather than by validated biological coordinates. Two experiments described as the same region may sample different tissue, different local populations, and different molecular environments. This hidden variation reduces reproducibility, and it can make a sampling difference look like a task effect.
 
-We will introduce NeuroFrame as a new cloud-accelerated research program for biologically grounded registration of extracellular recordings. The immediate goal is to determine how accurately self-supervised foundation models can infer atlas position from extracellular recordings and probe geometry on held-out animals and recording systems. We will scale geometry-aware local-field-potential encoders beyond the current 95-million-parameter, 1-million-sample limit; train converged models at larger capacity and corpus sizes; and extend the representation to native 30-kHz action-potential recordings (AP2vec). Each model will return a predictive distribution, not only a point estimate, and will be evaluated with animal-level splits, correspondence-breaking controls, calibration, uncertainty, and abstention when evidence does not support fine localization.
+We will develop NeuroFrame, a cloud-accelerated program for biologically grounded registration of extracellular recordings. Our immediate goal is to measure how accurately self-supervised models infer atlas position from extracellular signals and probe geometry in held-out animals and recording systems. We will scale geometry-aware local field potential encoders past the present limit of 95 million parameters and one million samples. We will train those models to convergence at larger capacity and corpus size. We will then extend the representation to native 30-kilohertz action potential recordings. Every model will return a predictive distribution rather than a point estimate. We will evaluate with animal-level splits, correspondence-breaking controls, calibration, and abstention when the evidence does not support fine localization.
 
-Google Cloud is essential because the longest multi-GPU jobs exceed NYU Torch's single-allocation wall-time/GPU policy, while the AP corpus requires substantially more memory, local staging, and I/O than the current pipeline. We will use public Allen Brain Observatory, IBL Brain-Wide Map, and DANDI data only. The award will produce converged scaling measurements, released checkpoints, reproducible evaluation code, and an interactive atlas demonstration, strengthening future NSF, NIH BRAIN, NeuroNex, CRCNS, and related proposals.
+Google Cloud is necessary for this work. Our longest multi-GPU jobs exceed the single-allocation limits of NYU's Torch cluster, and the action potential corpus needs more memory, local staging, and input-output bandwidth than the present pipeline. We will use public Allen Brain Observatory, IBL Brain-Wide Map, and DANDI data only. The award will produce converged scaling measurements, released checkpoints, reproducible evaluation code, and an interactive atlas demonstration. These results will strengthen future NSF, NIH BRAIN, NeuroNex, and CRCNS proposals.
 
 \newpage
 
@@ -59,42 +59,44 @@ Google Cloud is essential because the longest multi-GPU jobs exceed NYU Torch's 
 \setlength{\parskip}{2pt}
 \setlength{\tabcolsep}{3pt}
 \heading{Research Project}
-\subheading{1. Importance and motivation}
+\subheading{1. Recordings lack a common biological reference}
 
-Large-scale neural recordings now span many animals, laboratories, behavioral paradigms, and probe designs, but the biological reference for a recording is often an informal targeting coordinate, so two experiments labeled as the same region may sample different atlas positions, local populations, or molecular environments. Pooling such recordings can confound task effects with sampling differences; analyzing every animal independently sacrifices statistical power. Histology remains essential for many studies, but it is post hoc, static, and does not provide a real-time estimate of electrical-source position or tissue motion.
+Large-scale neural recordings now span many animals, laboratories, tasks, and probe designs. The biological reference for a recording is still often an informal targeting coordinate. Two experiments labeled as the same region may sample different atlas positions, different local populations, or different molecular environments. Pooling such recordings creates a hidden confound. Analyzing every animal separately loses statistical power. Histology remains essential, but it is post hoc and static, and it cannot estimate electrical-source position or tissue motion during a recording.
 
-NeuroFrame's central hypothesis is that the spatial structure of extracellular activity relative to known probe geometry contains enough information to estimate biological position at a resolution supported by held-out data. This project will establish the first two technical pillars of that new program: atlas registration from LFP and probe geometry, and a native action-potential extension that tests whether the same idea can access finer-scale spatial and cellular information.
+Our central hypothesis is that the spatial structure of extracellular activity, relative to known probe geometry, carries enough information to estimate biological position at resolutions supported by held-out data. This award will establish the first two technical pillars of that program. The first is atlas registration from local field potentials and probe geometry. The second is a native action potential extension that tests whether the same idea reaches finer spatial and cellular information.
 
-Preliminary work establishes feasibility (Figure~\ref{fig:prelim}). On held-out IBL animals, geometry-aware self-supervision plus a probe-sequence decoder reaches approximately 1.29 mm raw three-dimensional localization error, and 1.20 mm after rigid probe-geometry refinement. Increasing self-supervised data from 25k to 1M samples improves frozen-decoder performance monotonically at every rung, while prior experiments have used essentially the same wav2vec2-base backbone (approximately 95M parameters). Data have therefore been scaled by a factor of forty while model capacity has been held fixed, and the per-decade gain is narrowing. The key unanswered question is whether that narrowing reflects insufficient model capacity and incomplete pretraining rather than a limit of the signal. A second unresolved question is whether native 30-kHz action-potential modeling can recover information discarded by the current single-channel, downsampled AP transfer pipeline.
+Preliminary work establishes feasibility (Figure~\ref{fig:prelim}). In held-out IBL animals, a geometry-aware encoder with a probe-sequence readout reached 1,290 micrometers of three-dimensional localization error, and 1,200 micrometers after rigid refinement against known contact geometry. Error fell at every pretraining scale from 25,000 to one million samples. Two questions remain open. We have scaled data by a factor of forty while holding capacity fixed at roughly 95 million parameters, and the gain per decade is narrowing. We do not yet know whether that narrowing reflects limited capacity and truncated pretraining or a limit of the signal itself. We also do not know whether native 30-kilohertz modeling recovers information that our current single-channel, downsampled transfer pipeline discards.
 
-\subheading{2. Goals and aims}
-\textbf{Aim 1 -- Converged capacity and data scaling.} Train geometry-aware LFP encoders at approximately 95M, 317M, and 1B parameters across validated corpus sizes from the existing 1M scale toward 10M and 32M chunks. Complete intended training schedules instead of relying on early snapshots forced by local wall-time limits. Evaluate every headline cell with frozen linear, nonlinear, and sequence readouts on held-out animals and probes.
+\subheading{2. Objectives}
+\textbf{Aim 1. Converged capacity and data scaling.} We will train geometry-aware encoders at approximately 95 million, 317 million, and 1 billion parameters, across corpus sizes from the present one million samples toward 10 million and 32 million chunks. We will complete the intended training schedule for every cell rather than reporting the early snapshots that local wall-time limits now force. We will evaluate every headline cell with frozen linear, nonlinear, and sequence readouts in held-out animals and probes.
 
-\textbf{Aim 2 -- Native AP2vec feasibility.} Train a native 30-kHz action-potential encoder with a multi-channel spatial frontend. The current transfer experiment resamples AP to the LFP rate and uses one channel, producing a negative held-out result; it therefore cannot test the spatial waveform information that motivates AP2vec. We will establish whether native sampling and neighboring-contact context improve source/localization representations, while reporting negative results if they do not.
+\textbf{Aim 2. Native action potential feasibility.} We will train a native 30-kilohertz encoder with a multichannel spatial frontend. Our current transfer experiment resamples action potential data to the local field potential rate and uses one channel, and it produced a negative held-out result. That experiment cannot test the spatial waveform information that motivates the approach. We will determine whether native sampling and neighboring-contact context improve source and localization representations, and we will report the negative result if they do not.
 
-\textbf{Aim 3 -- Molecular and cell-type context with calibrated registration.} Propagate atlas-position uncertainty into atlas-derived gene-expression and molecular annotations, and test whether the same learned electrical representations predict independently measured cell types and molecular context. For every model, report raw coordinate error, axis-specific error, atlas-region accuracy, predictive uncertainty, calibration, and answer/abstention rate using complete animal/session/probe holdouts and correspondence-breaking controls.
+\textbf{Aim 3. Molecular context with calibrated registration.} We will propagate atlas-position uncertainty into atlas-derived gene expression and molecular annotation. We will test whether the same electrical representations predict independently measured cell types. For every model we will report raw coordinate error, per-axis error, atlas-region accuracy, predictive uncertainty, calibration, and abstention rate, using complete animal, session, and probe holdouts together with correspondence-breaking controls.
 
-\textbf{Aim 4 -- Behavior decoding from the same foundation model.} Without training a separate behavior-specific encoder, freeze the LFP/AP foundation representation and use lightweight readouts to decode stimulus side, choice, and wheel movement in locked IBL windows, with an optional ITI-prior plus signed-contrast policy analysis. Evaluate subject- and probe-disjoint transfer and compare neural-only predictions with behavior-only baselines. This tests whether the same representation captures behaviorally relevant information while separating task signal from anatomical and molecular sampling differences.
+\textbf{Aim 4. Behavior decoding from the same representation.} We will freeze the pretrained representation and fit lightweight readouts for stimulus side, choice, and wheel movement in locked IBL windows, without training a behavior-specific encoder. We will evaluate subject-disjoint and probe-disjoint transfer and compare neural predictions against behavior-only baselines. This tests whether one representation carries behaviorally relevant information while sampling differences are held in view.
 
-\subheading{3. Methodology}
-We will use public Allen Brain Observatory, IBL Brain-Wide Map, and DANDI resources; human intracranial recordings are outside this award's scope and remain on NYU infrastructure under existing agreements. Dataset manifests will freeze animal/session/probe membership, preprocessing, probe geometry, labels, exclusions, and train/calibration/test splits before final evaluation. The LFP model retains the validated masked-prediction, temporal-contrastive, and codebook-diversity objectives, augmented by geometry-aware distance supervision from relative probe layout; absolute channel identifiers and atlas coordinates are never supplied as encoder shortcuts. The AP model uses native 30-kHz windows, neighboring-contact context, and the same correspondence-aware design.
+\subheading{3. Methods, evaluation, and controls}
+\textbf{Data.} We will use public Allen Brain Observatory, IBL Brain-Wide Map, and DANDI resources. Human intracranial recordings are outside the scope of this award and will remain on NYU infrastructure under existing agreements. Manifests will freeze animal, session, and probe membership, preprocessing, probe geometry, labels, exclusions, and splits before final evaluation.
 
-Every stage is checkpointed, recording software, hardware, seed, manifest, effective sample size, and cloud cost. Evaluation proceeds at three levels: held-out animals within represented recording systems; zero-shot laboratory, probe-family, or system transfer; and prespecified few-animal recalibration if zero-shot transfer fails. Independent animals, sessions, probes, or preparations--not windows or contacts--determine confidence intervals. Formal conformal coverage claims are made only for exchangeable calibration/test cohorts; under declared distribution shift we report empirical coverage and abstain when overlap diagnostics do not support a calibrated answer.
+\textbf{Models.} The local field potential model retains our validated masked-prediction, temporal-contrastive, and codebook-diversity objectives. Geometry-aware distance supervision, derived from relative contact layout, is added to them. Absolute channel identifiers and atlas coordinates are never supplied to the encoder. The action potential model uses native 30-kilohertz windows and neighboring-contact context under the same design.
+
+\textbf{Evaluation.} We will evaluate in three stages: held-out animals within represented recording systems, zero-shot transfer to a laboratory or probe family excluded from training, and prespecified few-animal recalibration if zero-shot transfer fails. Independent animals, sessions, probes, or preparations will determine confidence intervals, not windows or contacts. We will make formal coverage claims only for exchangeable calibration and test cohorts. Under declared distribution shift we will report empirical coverage and abstain when overlap diagnostics do not support a calibrated answer. Every stage is checkpointed, and we will record software, hardware, seed, manifest, effective sample size, and cost.
 
 \newpage
 
 \heading{Research Project (continued)}
-\subheading{4. GCP-enabled work and timeline}
-\textbf{August 2026 -- portability and efficiency gate.} Containerize the validated training/evaluation pipeline; stage sharded public corpora on Cloud Storage and node-local SSD; benchmark mixed precision with fp32 master weights, FlashAttention, gradient accumulation, distributed loading, and FSDP; reproduce the current LFP baselines on GCP before launching the scaling grid.
+\subheading{4. Cloud-enabled work and timeline}
+\textbf{August 2026. Portability and efficiency gate.} We will containerize the validated training and evaluation pipeline, stage sharded public corpora on Cloud Storage and node-local SSD, and benchmark mixed precision with fp32 master weights, FlashAttention, gradient accumulation, distributed loading, and FSDP. We will reproduce our current baselines on Google Cloud before launching the grid.
 
-\textbf{September -- LFP capacity/data grid.} Run the 95M/317M/1B and 10M/32M corpus cells that pass the efficiency gate, with checkpointed multi-GPU jobs long enough to avoid local wall-time truncation. The existing 1M column provides the baseline; GCP funds the larger corpus columns and capacity comparison.
+\textbf{September. Capacity and data grid.} We will run the capacity and corpus cells that pass the efficiency gate, using checkpointed multi-GPU jobs long enough to avoid wall-time truncation. The existing one-million-sample column is the baseline. The award funds the larger corpus columns and the capacity comparison.
 
-\textbf{October -- AP2vec and replication.} Train native AP models on the H200-capable configuration, run the highest-priority LFP/AP seed replications, and perform held-out-system evaluations. Stop or narrow any arm that fails its prespecified memory, throughput, or correspondence-control gate.
+\textbf{October. Native action potentials and replication.} We will train native models on the H200 configuration, run the highest-priority replications, and evaluate held-out recording systems. We will stop or narrow any arm that fails its prespecified memory, throughput, or control gate.
 
-\textbf{November 1--25 -- evaluation and release.} Freeze checkpoints, run calibration and uncertainty analyses, generate scaling and failure-mode figures, publish reproducible manifests/code, and deploy a small interactive atlas demonstration. November 26--30 is reserved for final artifact egress and account closure; no new uncheckpointed experiments will be started.
+\textbf{November 1--25. Evaluation and release.} We will freeze checkpoints, run calibration and uncertainty analyses, produce scaling and failure-mode figures, publish manifests and code, and deploy a small interactive atlas demonstration. November 26--30 is reserved for artifact export and account closure. We will start no uncheckpointed experiment in that window.
 
 \subheading{5. Resource sizing, storage, and compute}
-Sizing assumes three-second chunks: LFP at 1,250 Hz/float32 (15,000 bytes/channel) and native AP at 30 kHz/int16 (180,000 bytes/channel). AP assumes four neighboring contacts; figures exclude checkpoints and staging. We reserve at least 20\% extra capacity.
+Sizing assumes three-second chunks. Local field potentials are 1,250 hertz float32, or 15,000 bytes per channel. Native action potentials are 30 kilohertz int16, or 180,000 bytes per channel. The four-channel rows assume neighboring contacts. These figures exclude checkpoints and staging, and we reserve at least 20\% additional capacity.
 
 \begin{center}
 \small
@@ -110,7 +112,7 @@ AP, 4 channels & 7.20 TB & 43.20 TB\\
 \end{tabularx}
 \end{center}
 
-The 60M four-channel AP endpoint is approximately 43.2 TB before working copies--beyond NYU's 5 TB scratch quota. We will use one 8-GPU node per long job with FSDP and activation checkpointing for the 1B and large-Whisper cells; AP requires H200 for HBM, host RAM, and I/O.
+The four-channel action potential corpus reaches approximately 43.2 TB at 60 million chunks, before working copies. NYU's scratch quota is 5 TB. We will use one 8-GPU node per long job, with FSDP and activation checkpointing for the largest cells. Native action potential training requires H200 for memory, host RAM, and input-output bandwidth.
 
 \begin{center}
 \scriptsize
@@ -127,10 +129,10 @@ Whisper-large-v3 encoder (\textasciitilde636M) & 229.0 EFLOPs / 643 GPU-h & 1,37
 \end{tabularx}
 \end{center}
 
-FLOPs use 30 epochs, 10\% MFU, 149/150/281 tokens per LFP/Whisper/AP chunk, 6ND for Wav2Vec2, and 8ND for Whisper student plus EMA teacher. The August gate replaces estimates with measured throughput. Whisper-large-v3 is 1.55B parameters including its decoder; we budget its approximately 636M encoder. Sources: OpenAI, Hugging Face, and Google Cloud A3 documentation.
+These estimates assume 30 epochs at 10\% model FLOPs utilization, with 149, 150, and 281 tokens per chunk for the local field potential, Whisper, and action potential configurations, 6ND for Wav2Vec2, and 8ND for a Whisper student with an EMA teacher. Our completed runs used 200 epochs at roughly 0.6\% utilization, so the August gate exists to replace these estimates with measured throughput before the grid launches. Whisper-large-v3 has 1.55 billion parameters including its decoder; we budget its 636-million-parameter encoder. Sources are OpenAI, Hugging Face, and Google Cloud A3 documentation.
 
-\subheading{6. Expected outcomes and significance}
-The minimum outcome is a rigorously measured, converged capacity/data scaling curve and a reproducible answer about whether native AP modeling adds information beyond LFP. Positive results would establish a new route to biologically grounded registration across recording systems; negative results would still identify a tested resolution or architecture limit and prevent the field from interpreting truncated or downsampled runs as evidence of failure. Released checkpoints, animal-level splits, calibration tools, and evaluation code will establish a strong foundation for future NeuroFrame proposals and external funding.
+\subheading{6. Expected outcomes}
+The minimum outcome is a converged capacity and data scaling curve, measured rather than extrapolated, and a reproducible answer about whether native action potential modeling adds information beyond local field potentials. A positive result would establish a route to biologically grounded registration across recording systems. A negative result would identify a tested resolution or architecture limit, and would keep the field from reading truncated or downsampled runs as evidence of failure. We will release checkpoints, animal-level manifests, calibration tools, and evaluation code.
 
 \begin{figure}[H]
 \centering
@@ -145,29 +147,29 @@ The minimum outcome is a rigorously measured, converged capacity/data scaling cu
 % Proposed GCP Usage (one page)
 % ---------------------------------------------------------------------------
 \heading{Proposed GCP Usage}
-We request up to \textbf{\$100,000 in GCP credit} for eligible research use during the August--November 2026 award window, with all credit spent by November 30, 2026. The latest audited package is checkpointable and gated: the efficiency benchmark must pass before the full grid launches.
+We request up to \textbf{\$100,000 in Google Cloud credit} for eligible research use between August and November 2026, with all credit spent by November 30, 2026. Every item below is checkpointable. The efficiency benchmark must pass before the full grid launches.
 
 \begin{center}
 \small
 \begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{1.45in}X}
 \toprule
-\textbf{Resource} & \textbf{Planned use / envelope}\\
+\textbf{Resource} & \textbf{Planned use and envelope}\\
 \midrule
-A3 High / Flex-start & LFP capacity $\times$ corpus ladder (95M/317M/1B $\times$ 10M/32M chunks), approximately 13,402 GPU-hours; \$64,195.\\
-A3 Ultra / H200 & Native 30-kHz AP2vec (95M at 1M and 30M chunks; 317M at 1M), approximately 1,390 GPU-hours; \$7,368.\\
-Gated Whisper cell & One matched 10M-cell comparison, approximately 916 GPU-hours; \$4,388, launched only if the efficiency/scientific gate closes.\\
-Storage and data & Hot public training shards, Coldline archive, checkpoints, operations, persistent disk, and 5 TB egress; approximately \$3,394.\\
-Evaluation / preprocessing & Ray Tune search, downstream fine-tuning, OOD/Kabsch evaluation, and AP corpus preprocessing; approximately \$12,752.\\
-Contingency & Approximately \$7,903, reserved for prespecified checkpointable burn-down items and price/throughput uncertainty.\\
+A3 High / Flex-start & Capacity by corpus ladder for the LFP encoder (95M, 317M, and 1B parameters at 10M and 32M chunks). Approximately 13,402 GPU-hours; \$64,195.\\
+A3 Ultra / H200 & Native 30-kilohertz action potential training (95M at 1M and 30M chunks, 317M at 1M). Approximately 1,390 GPU-hours; \$7,368.\\
+Gated Whisper cell & One matched 10M comparison. Approximately 916 GPU-hours; \$4,388. Launched only if the efficiency and scientific gate closes.\\
+Storage and data & Hot public training shards, Coldline archive, checkpoints, operations, persistent disk, and 5 TB egress. Approximately \$3,394.\\
+Evaluation and preprocessing & Hyperparameter search, downstream fine-tuning, held-out evaluation, and action potential preprocessing. Approximately \$12,752.\\
+Contingency & Approximately \$7,903, held for prespecified checkpointable items and for price and throughput uncertainty.\\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-\subheading{Why GCP materially improves on NYU resources}
-NYU Torch supports ordinary short and single-GPU jobs, but the target workloads combine multi-GPU training, multi-day uninterrupted execution, high host memory, large local staging, and I/O. The measured 95M/1M pretraining run required approximately 747 GPU-hours and had to be chained across wall-time-limited jobs. Native AP additionally requires substantially more memory and staging than the LFP pipeline. GCP supplies the simultaneous multi-GPU and multi-day window, H200 memory, bundled node-local SSD, and Cloud Batch orchestration needed for auditable, checkpointed workflows.
+\subheading{Why Google Cloud rather than NYU resources}
+NYU's Torch cluster serves short and single-GPU jobs well. The workloads in this proposal instead combine multi-GPU training, multi-day uninterrupted execution, high host memory, large local staging, and sustained input-output. Torch allocates either 24 GPUs for 48 hours or 4 GPUs for 168 hours, so no single uninterrupted computation there can exceed 672 GPU-hours. One seed of our largest planned cell, the 1-billion-parameter model at 32 million chunks, needs approximately 2,411 GPU-hours. That is 3.6 times the longest allocation the cluster can grant, and it is why our completed 95-million-parameter run at one million samples, which required approximately 747 GPU-hours, had to be chained across wall-time-limited jobs. Native action potential training additionally needs more memory and staging than the present pipeline. Google Cloud supplies the simultaneous multi-GPU and multi-day window, H200 memory, bundled node-local SSD, and Cloud Batch orchestration that these runs require.
 
 \subheading{Governance and cost control}
-We will use containerized jobs, versioned manifests, least-privilege project access, and logs recording configuration, seed, split, hardware, cost, and artifact checksum. Cloud Storage will contain public Allen, IBL, and DANDI data plus derived research artifacts; human intracranial data are excluded. Jobs that fail memory, throughput, or correspondence-control criteria will be stopped and their allocation redirected to prespecified evaluation or replication tasks. Vertex AI managed-training fees, Vizier trials, committed-use contracts, and TPU work are excluded from the requested budget.
+We will use containerized jobs, versioned manifests, and least-privilege project access. Logs will record configuration, seed, split, hardware, cost, and artifact checksum. Cloud Storage will hold public Allen, IBL, and DANDI data and the artifacts derived from them. Human intracranial data are excluded. We will stop any job that fails its memory, throughput, or control criteria and redirect its allocation to prespecified evaluation or replication work. Vertex AI managed-training fees, Vizier trials, committed-use contracts, and TPU work are excluded from this request. Results and released checkpoints will be exported to NYU before the credit expires.
 
 \newpage
 
@@ -175,27 +177,27 @@ We will use containerized jobs, versioned manifests, least-privilege project acc
 % Future Funding Plans (one page)
 % ---------------------------------------------------------------------------
 \heading{Future Funding Plans}
-This award will establish NeuroFrame as a measured, reproducible research program. It will provide three assets that reviewers routinely require but that cannot be produced reliably under NYU Torch's current allocation shape: (1) converged capacity/data scaling curves rather than wall-time-truncated snapshots; (2) a technically honest native-AP feasibility result, including a well-controlled negative result if AP2vec does not improve localization; and (3) released checkpoints, animal-level manifests, calibration analyses, and correspondence-breaking controls that make the claims independently testable.
+This award will establish NeuroFrame as a measured and reproducible research program. It will produce three assets that reviewers ask for and that the current allocation shape at NYU cannot reliably deliver. The first is a converged capacity and data scaling curve rather than a set of wall-time-truncated snapshots. The second is an honest native action potential feasibility result, including a well-controlled negative result if the approach does not improve localization. The third is a public release of checkpoints, animal-level manifests, calibration analyses, and correspondence-breaking controls, so that the claims can be tested independently.
 
-The results will strengthen the following future submissions:
+The results will strengthen the following submissions.
 
 \begin{center}
 \small
 \begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{1.65in}X}
 \toprule
-\textbf{Agency / program} & \textbf{How this award strengthens the application}\\
+\textbf{Agency and program} & \textbf{How this award strengthens the application}\\
 \midrule
-NSF -- CAREER & Supplies preliminary evidence for NeuroFrame's capacity, cross-system generalization, uncertainty, and abstention hypotheses, while narrowing the CAREER plan to validated endpoints and realistic compute.\\
-NIH -- BRAIN Initiative / BRAIN Data Science and related R01 mechanisms & Provides a reproducible registration benchmark, released weights, and a calibrated evaluation protocol for integrating large-scale electrophysiology across animals and probe systems.\\
-NSF -- NeuroNex and CRCNS & Demonstrates a portable, geometry-aware foundation-model pipeline and a concrete cross-laboratory/probe transfer test using public data and frozen manifests.\\
-Simons Foundation -- Collaboration on the Global Brain and related programs & Tests whether biological registration can separate sampling variation from task-related population structure, with uncertainty-aware matching rather than uncalibrated alignment.\\
+NSF, CAREER & Supplies preliminary evidence for the capacity, cross-system generalization, uncertainty, and abstention hypotheses, and narrows the plan to validated endpoints and realistic compute.\\
+NIH, BRAIN Initiative and related R01 mechanisms & Provides a reproducible registration benchmark, released weights, and a calibrated evaluation protocol for integrating recordings across animals and probe systems.\\
+NSF, NeuroNex and CRCNS & Demonstrates a portable geometry-aware pipeline and a concrete cross-laboratory and cross-probe transfer test on public data with frozen manifests.\\
+Simons Foundation, Collaboration on the Global Brain & Tests whether biological registration separates sampling variation from task-related population structure, using uncertainty-aware matching rather than uncalibrated alignment.\\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-The award period is deliberately aligned with a near-term submission cycle. By November 30, the team will have frozen the data manifests and checkpoints, completed held-out and calibration analyses, exported artifacts to NYU, and prepared scaling and failure-mode figures suitable for external proposals. The work therefore functions as a low-risk feasibility and benchmarking stage for a larger multi-year program, while preserving value if the capacity or native-AP hypotheses are not supported.
+The award period is aligned with a near-term submission cycle. By November 30 we will have frozen manifests and checkpoints, completed held-out and calibration analyses, exported artifacts to NYU, and prepared scaling and failure-mode figures for external proposals. The work is therefore a low-risk feasibility and benchmarking stage for a larger multi-year program, and it retains value if the capacity or native action potential hypotheses are not supported.
 
-\textbf{Required accompanying documents.} The InfoReady submission must also include the PI CV, CVs of any co-PIs, and Current and Pending Funding / Other Support for the PI and co-PIs. These documents were not present in the project workspace and must be appended by the submitting team; no biographical or support information has been inferred here.
+\textbf{Required accompanying documents.} The InfoReady submission must also include the PI CV, the CV of each co-PI, and Current and Pending Funding and Other Support for the PI and each co-PI. These documents were not present in the project workspace and must be appended by the submitting team. No biographical or support information has been inferred here.
 
 \newpage
 
@@ -203,7 +205,7 @@ The award period is deliberately aligned with a near-term submission cycle. By N
 % Attachments checklist (separate from narrative page limits)
 % ---------------------------------------------------------------------------
 \heading{Required Attachments -- To Be Appended in InfoReady}
-The following are required by the NYU GCP for Research application instructions and are not part of the four page-limited narrative sections above.
+The following items are required by the NYU application instructions. They are not part of the four page-limited narrative sections above.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.0in}X}
@@ -218,7 +220,7 @@ Current and Pending Funding / Other Support -- each co-PI & Required if applicab
 \end{tabularx}
 \end{center}
 
-The four narrative sections are formatted as: Project Summary (1 page), Research Project (2 pages), Proposed GCP Usage (1 page), and Future Funding Plans (1 page). This checklist is intentionally separate and should not be submitted in place of the required CV/support documents.
+The four narrative sections are formatted as Project Summary (1 page), Research Project (2 pages), Proposed GCP Usage (1 page), and Future Funding Plans (1 page). This checklist is separate and should not be submitted in place of the required CV and support documents.
 
 \vfill
 \small\textbf{Resource-estimate sources:} OpenAI Whisper model sizes and VRAM guidance: \sourceurl{https://github.com/openai/whisper/blob/main/README.md}{openai/whisper}; Hugging Face Wav2Vec2 configuration/model: \sourceurl{https://huggingface.co/docs/transformers/model_doc/wav2vec2}{Wav2Vec2 documentation} and \sourceurl{https://huggingface.co/facebook/wav2vec2-large}{Wav2Vec2-large}; Google Cloud A3 specifications and Flex-start pricing: \sourceurl{https://cloud.google.com/products/compute/pricing/accelerator-optimized}{accelerator-optimized pricing}.
