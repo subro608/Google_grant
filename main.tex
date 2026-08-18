@@ -57,8 +57,11 @@ Google Cloud is necessary for this work. Our longest multi-GPU jobs exceed the s
 % ---------------------------------------------------------------------------
 \begingroup
 \small
-\setlength{\parskip}{2pt}
+\setlength{\parskip}{1pt}
 \setlength{\tabcolsep}{3pt}
+\setlength{\textfloatsep}{6pt}
+\setlength{\floatsep}{4pt}
+\setlength{\intextsep}{4pt}
 \heading{Research Project}
 \subheading{1. Recordings lack a common biological reference}
 
@@ -80,7 +83,7 @@ Preliminary work establishes feasibility (Figure~\ref{fig:prelim}). In held-out 
 \subheading{3. Methods, evaluation, and controls}
 \textbf{Data.} We will use public Allen Brain Observatory, IBL Brain-Wide Map, and DANDI resources. Human intracranial recordings are outside the scope of this award and will remain on NYU infrastructure under existing agreements. Manifests will freeze animal, session, and probe membership, preprocessing, probe geometry, labels, exclusions, and splits before final evaluation.
 
-\textbf{Models.} The local field potential model is a Wav2Vec2-family encoder scaled from base (95M) through large (317M) to a 1B target configuration. It retains our validated masked-prediction, temporal-contrastive, and codebook-diversity objectives. Geometry-aware distance supervision, derived from relative contact layout, is added to them. Absolute channel identifiers and atlas coordinates are never supplied to the encoder. The action potential model uses native 30-kilohertz windows and neighboring-contact context under the same design. One gated Whisper encoder cell at 10M chunks provides a matched architecture comparison only if the August efficiency gate closes.
+\textbf{Models.} The local field potential model is a Wav2Vec2-family encoder scaled from base (95M) through large (317M) to a 1B target configuration. It retains our validated masked-prediction, temporal-contrastive, and codebook-diversity objectives plus geometry-aware distance supervision from relative contact layout; absolute channel identifiers and atlas coordinates are never supplied to the encoder. The action potential model uses native 30-kilohertz windows and neighboring-contact context under the same design.
 
 \textbf{Evaluation.} We will evaluate in three stages: held-out animals within represented recording systems, zero-shot transfer to a laboratory or probe family excluded from training, and prespecified few-animal recalibration if zero-shot transfer fails. Independent animals, sessions, probes, or preparations will determine confidence intervals, not windows or contacts. We will make formal coverage claims only for exchangeable calibration and test cohorts. Under declared distribution shift we will report empirical coverage and abstain when overlap diagnostics do not support a calibrated answer. Every stage is checkpointed, and we will record software, hardware, seed, manifest, effective sample size, and cost.
 
@@ -88,7 +91,7 @@ Preliminary work establishes feasibility (Figure~\ref{fig:prelim}). In held-out 
 
 \heading{Research Project (continued)}
 \subheading{4. Cloud-enabled work and timeline}
-\textbf{August 2026. Portability and efficiency gate.} We will containerize the validated training and evaluation pipeline, stage sharded public corpora on Cloud Storage and node-local SSD, and benchmark mixed precision with fp32 master weights, FlashAttention, gradient accumulation, distributed loading, and FSDP. We will reproduce our current baselines on Google Cloud before launching the grid.
+\textbf{August 2026. Portability and efficiency gate.} We will containerize the training and evaluation pipeline, stage sharded public corpora on Cloud Storage and node-local SSD, and benchmark mixed precision, FlashAttention, and FSDP. We will reproduce current baselines on Google Cloud before launching the grid.
 
 \textbf{September. Capacity and data grid.} We will run the capacity and corpus cells that pass the efficiency gate, using checkpointed multi-GPU jobs long enough to avoid wall-time truncation. The existing one-million-sample column is the baseline. The award funds the larger corpus columns and the capacity comparison.
 
@@ -97,15 +100,17 @@ Preliminary work establishes feasibility (Figure~\ref{fig:prelim}). In held-out 
 \textbf{November 1--25. Evaluation and release.} We will freeze checkpoints, run calibration and uncertainty analyses, produce scaling and failure-mode figures, publish manifests and code, and deploy a small interactive atlas demonstration. November 26--30 is reserved for artifact export and account closure. We will start no uncheckpointed experiment in that window.
 
 \subheading{5. Resource sizing, storage, and compute}
-Sizing assumes three-second chunks: local field potentials (1,250 hertz float32) occupy 15,000 bytes per channel and native action potentials (30 kilohertz int16) 180,000 bytes, with four-channel layouts using neighboring contacts. The funded action potential corpus at 30 million chunks is approximately 5.4 TB on its own, larger than NYU's entire 5 TB scratch quota, before checkpoints, staging and a 20\% reserve. Each long job uses one 8-GPU node with FSDP and activation checkpointing for the largest cells; native action potential training requires H200 for memory, host RAM, and input-output bandwidth. Assuming 30 epochs at 10\% model FLOPs utilization, compute spans roughly 72 GPU-hours for Wav2Vec2-base at 10 million chunks to 2,411 GPU-hours for the 1B-parameter target at 32 million chunks, with the Whisper encoders falling in between; the gated Whisper cell is costed on its encoder only. Our completed runs used 200 epochs at roughly 0.6\% utilization, so the August gate exists to replace these estimates with measured throughput before the grid launches. Parameter and throughput figures follow OpenAI, Hugging Face, and Google Cloud A3 documentation.
+Sizing assumes three-second chunks: local field potentials (1,250 hertz float32) occupy 15,000 bytes per channel and native action potentials (30 kilohertz int16) 180,000 bytes, with four-channel layouts using neighboring contacts. The funded action potential corpus at 30 million chunks is approximately 5.4 TB on its own, larger than NYU's entire 5 TB scratch quota, before checkpoints, staging and a 20\% reserve. Each long job uses one 8-GPU node with FSDP and activation checkpointing for the largest cells; native action potential training requires H200 for memory, host RAM, and input-output bandwidth. At 30 epochs and 10\% model FLOPs utilization, compute spans roughly 72 GPU-hours for Wav2Vec2-base at 10 million chunks to 2,411 GPU-hours for the 1B target at 32 million chunks; the August gate replaces these estimates with measured throughput before the grid launches.
 
 \subheading{6. Expected outcomes}
-The minimum outcome is a converged capacity and data scaling curve, measured rather than extrapolated, and a reproducible answer about whether native action potential modeling adds information beyond local field potentials. A positive result would establish a route to biologically grounded registration across recording systems. A negative result would identify a tested resolution or architecture limit, and would keep the field from reading truncated or downsampled runs as evidence of failure. We will release checkpoints, animal-level manifests, calibration tools, and evaluation code.
+The minimum outcome is a converged capacity and data scaling curve, measured rather than extrapolated, and a reproducible answer about whether native action potential modeling adds information beyond local field potentials. We will release checkpoints, animal-level manifests, calibration tools, and evaluation code.
 
+\vspace{-2pt}
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{figures/scaling_chanDistc_transformer_1M_geometry.png}
-\caption{\label{fig:prelim}\footnotesize Preliminary atlas localization improves with pretraining scale and has not yet saturated. (A) Held-out three-dimensional error against self-supervised pretraining scale for the geometry-aware LFP encoder with a probe-sequence readout. Error fell from 1,474 to 1,290 micrometers before geometric refinement and from 1,415 to 1,200 micrometers after it. Points are means over eight seeds and bars are standard deviations. The largest corpus we can currently train shows no sign of a limit. (B) The one-million-sample model in 119 held-out probes and 39,615 test channels. Refined predicted trajectories, in teal, followed histology-derived trajectories, in gray, across animals and probes excluded from training; the median per-probe path error was 898 micrometers. Refinement fits known contact geometry to the predictions and uses measured coordinates only for scoring.}
+\vspace{-4pt}
+\caption{\label{fig:prelim}\footnotesize (A) Held-out three-dimensional localization error versus pretraining scale for the geometry-aware LFP encoder (mean $\pm$ SD over eight seeds). (B) True and Kabsch-fitted probe paths in 119 held-out probes; median per-probe path error 898~µm.}
 \end{figure}
 
 \endgroup
