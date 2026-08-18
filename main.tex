@@ -104,7 +104,7 @@ The minimum outcome is a converged capacity and data scaling curve, measured rat
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.99\linewidth,height=1.42in,keepaspectratio]{figures/scaling_chanDistc_transformer_1M_geometry.png}
+\includegraphics[width=\linewidth]{figures/scaling_chanDistc_transformer_1M_geometry.png}
 \caption{\label{fig:prelim}\footnotesize Preliminary atlas localization improves with pretraining scale and has not yet saturated. (A) Held-out three-dimensional error against self-supervised pretraining scale for the geometry-aware LFP encoder with a probe-sequence readout. Error fell from 1,474 to 1,290 micrometers before geometric refinement and from 1,415 to 1,200 micrometers after it. Points are means over eight seeds and bars are standard deviations. The largest corpus we can currently train shows no sign of a limit. (B) The one-million-sample model in 119 held-out probes and 39,615 test channels. Refined predicted trajectories, in teal, followed histology-derived trajectories, in gray, across animals and probes excluded from training; the median per-probe path error was 898 micrometers. Refinement fits known contact geometry to the predictions and uses measured coordinates only for scoring.}
 \end{figure}
 
