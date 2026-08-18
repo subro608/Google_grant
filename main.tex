@@ -97,40 +97,7 @@ Preliminary work establishes feasibility (Figure~\ref{fig:prelim}). In held-out 
 \textbf{November 1--25. Evaluation and release.} We will freeze checkpoints, run calibration and uncertainty analyses, produce scaling and failure-mode figures, publish manifests and code, and deploy a small interactive atlas demonstration. November 26--30 is reserved for artifact export and account closure. We will start no uncheckpointed experiment in that window.
 
 \subheading{5. Resource sizing, storage, and compute}
-Sizing assumes three-second chunks. Local field potentials are 1,250 hertz float32, or 15,000 bytes per channel. Native action potentials are 30 kilohertz int16, or 180,000 bytes per channel. The four-channel rows assume neighboring contacts. These figures exclude checkpoints and staging, and we reserve at least 20\% additional capacity.
-
-\begin{center}
-\small
-\begin{tabularx}{0.92\linewidth}{>{\raggedright\arraybackslash}Xrr}
-\toprule
-\textbf{Layout} & \textbf{10M} & \textbf{60M}\\
-\midrule
-LFP, 1 channel & 0.15 TB & 0.90 TB\\
-LFP, 4 channels & 0.60 TB & 3.60 TB\\
-AP, 1 channel & 1.80 TB & 10.80 TB\\
-AP, 4 channels & 7.20 TB & 43.20 TB\\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-The four-channel action potential corpus reaches approximately 43.2 TB at 60 million chunks, before working copies. NYU's scratch quota is 5 TB. We will use one 8-GPU node per long job, with FSDP and activation checkpointing for the largest cells. Native action potential training requires H200 for memory, host RAM, and input-output bandwidth.
-
-\begin{center}
-\scriptsize
-\begin{tabularx}{0.98\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X}
-\toprule
-\textbf{Model} & \textbf{10M chunks} & \textbf{60M chunks}\\
-\midrule
-Wav2Vec2-base (95M) & 25.5 EFLOPs / 72 GPU-h & 152.9 EFLOPs / 429 GPU-h\\
-Wav2Vec2-large (317M) & 85.0 EFLOPs / 239 GPU-h & 510.1 EFLOPs / 1,433 GPU-h\\
-Wav2Vec2 target (1B) & 268.2 EFLOPs / 753 GPU-h & 1,609.2 EFLOPs / 4,520 GPU-h\\
-Whisper-medium encoder (\textasciitilde310M) & 111.6 EFLOPs / 313 GPU-h & 669.6 EFLOPs / 1,881 GPU-h\\
-Whisper-large-v3 encoder (\textasciitilde636M) & 229.0 EFLOPs / 643 GPU-h & 1,373.8 EFLOPs / 3,858 GPU-h\\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-These estimates assume 30 epochs at 10\% model FLOPs utilization, with 149, 150, and 281 tokens per chunk for the local field potential, Whisper, and action potential configurations, 6ND for Wav2Vec2, and 8ND for a Whisper student with an EMA teacher. Our completed runs used 200 epochs at roughly 0.6\% utilization, so the August gate exists to replace these estimates with measured throughput before the grid launches. Whisper-large-v3 has 1.55 billion parameters including its decoder; we budget its 636-million-parameter encoder. Sources are OpenAI, Hugging Face, and Google Cloud A3 documentation.
+Sizing assumes three-second chunks: local field potentials (1,250 hertz float32) occupy 15,000 bytes per channel and native action potentials (30 kilohertz int16) 180,000 bytes, with four-channel layouts using neighboring contacts. Storage ranges from 0.15 TB for single-channel LFP at 10 million chunks to approximately 43.2 TB for the four-channel action potential corpus at 60 million chunks, excluding checkpoints and staging and before a 20\% reserve, well beyond NYU's 5 TB scratch quota. Each long job uses one 8-GPU node with FSDP and activation checkpointing for the largest cells; native action potential training requires H200 for memory, host RAM, and input-output bandwidth. Assuming 30 epochs at 10\% model FLOPs utilization, compute spans roughly 72 GPU-hours for Wav2Vec2-base at 10 million chunks to 4,520 GPU-hours for the 1B-parameter target at 60 million chunks, with the Whisper encoders falling in between; we budget only the 636-million-parameter encoder of Whisper-large-v3. Our completed runs used 200 epochs at roughly 0.6\% utilization, so the August gate exists to replace these estimates with measured throughput before the grid launches. Parameter and throughput figures follow OpenAI, Hugging Face, and Google Cloud A3 documentation.
 
 \subheading{6. Expected outcomes}
 The minimum outcome is a converged capacity and data scaling curve, measured rather than extrapolated, and a reproducible answer about whether native action potential modeling adds information beyond local field potentials. A positive result would establish a route to biologically grounded registration across recording systems. A negative result would identify a tested resolution or architecture limit, and would keep the field from reading truncated or downsampled runs as evidence of failure. We will release checkpoints, animal-level manifests, calibration tools, and evaluation code.
